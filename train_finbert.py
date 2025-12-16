@@ -25,8 +25,10 @@ import numpy as np
 # Настройка путей (используем относительные пути для кроссплатформенности)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "data.csv")
-MODEL_SAVE_PATH = os.path.join(BASE_DIR, "finbert_finetuned")
-MLFLOW_EXPERIMENT_NAME = "finbert_emotion_classification"
+# TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - путь сохранения модели
+MODEL_SAVE_PATH = os.path.join(BASE_DIR, "finbert_tone_finetuned")
+# TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - название эксперимента в MLFlow
+MLFLOW_EXPERIMENT_NAME = "finbert_tone_emotion_classification"
 MLFLOW_TRACKING_URI = os.path.join(BASE_DIR, "mlruns")
 
 # Проверка и загрузка данных
@@ -113,16 +115,20 @@ class EmotionDataset(Dataset):
 print("\n" + "="*60)
 print("🤖 ЗАГРУЗКА МОДЕЛИ")
 print("="*60)
-print("Загрузка ProsusAI/finbert...")
+# TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - название модели в print
+print("Загрузка yiyanghkust/finbert-tone...")
 
-tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
-# Используем ignore_mismatched_sizes=True, чтобы загрузить базовые веса BERT
+# TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - название модели в AutoTokenizer.from_pretrained
+tokenizer = AutoTokenizer.from_pretrained("yiyanghkust/finbert-tone")
+# TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - обновить комментарии о специфике модели
+# Используем ignore_mismatched_sizes=True, чтобы загрузить базовые веса FinBERT-Tone
 # и инициализировать новый classifier head с правильным количеством классов
-# Оригинальный finbert обучен на 3 класса (positive/negative/neutral),
-# но нам нужно 11 классов эмоций, поэтому classifier будет переинициализирован
-print(f"⚠️  Оригинальная модель имеет 3 класса, создаем новый classifier для {num_labels} классов")
+# Оригинальная модель finbert-tone обучена на задачу анализа тональности,
+# но нам нужно адаптировать её для классификации эмоций с нужным количеством классов
+print(f"⚠️  Адаптируем модель для {num_labels} классов эмоций")
+# TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - название модели в AutoModelForSequenceClassification.from_pretrained
 model = AutoModelForSequenceClassification.from_pretrained(
-    "ProsusAI/finbert",
+    "yiyanghkust/finbert-tone",
     num_labels=num_labels,
     problem_type="single_label_classification",
     ignore_mismatched_sizes=True  # Игнорируем несоответствие размера classifier
@@ -271,10 +277,12 @@ print("\n" + "="*60)
 print("🚀 НАЧАЛО ОБУЧЕНИЯ")
 print("="*60)
 
-with mlflow.start_run(run_name=f"finbert_emotion_{datetime.now().strftime('%Y%m%d_%H%M%S')}"):
+# TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - название run в MLFlow
+with mlflow.start_run(run_name=f"finbert_tone_emotion_{datetime.now().strftime('%Y%m%d_%H%M%S')}"):
     # Логирование параметров
     mlflow.log_params({
-        "model_name": "ProsusAI/finbert",
+        # TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - название модели в mlflow.log_params
+        "model_name": "yiyanghkust/finbert-tone",
         "num_labels": num_labels,
         "num_train_samples": len(train_df),
         "num_val_samples": len(val_df),
@@ -397,10 +405,11 @@ with mlflow.start_run(run_name=f"finbert_emotion_{datetime.now().strftime('%Y%m%
     
     # Сохранение через MLFlow (используем unwrapped модель)
     try:
+        # TODO: ИЗМЕНИТЬ ПРИ СМЕНЕ МОДЕЛИ - зарегистрированное имя модели в MLFlow
         mlflow.pytorch.log_model(
             model_to_save,
             "model",
-            registered_model_name="finbert_emotion_classifier"
+            registered_model_name="finbert_tone_emotion_classifier"
         )
         print("✅ Модель сохранена в MLFlow")
     except Exception as e:

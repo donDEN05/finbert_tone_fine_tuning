@@ -12,18 +12,16 @@ import inspect
 plt.rcParams['figure.figsize'] = (20, 14)
 plt.rcParams['font.size'] = 9
 
+MODEL_ID = "yiyanghkust/finbert-tone"
+
 print("="*80)
-print("🔍 АНАЛИЗ АРХИТЕКТУРЫ МОДЕЛИ FINBERT")
+print(f"🔍 АНАЛИЗ АРХИТЕКТУРЫ МОДЕЛИ {MODEL_ID.upper()}")
 print("="*80)
 
 # Загрузка модели
-print("\n📥 Загрузка модели ProsusAI/finbert...")
-tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
-model = AutoModelForSequenceClassification.from_pretrained(
-    "ProsusAI/finbert", 
-    num_labels=11,
-    ignore_mismatched_sizes=True  # Игнорируем несоответствие размера classifier
-)
+print(f"\n📥 Загрузка модели {MODEL_ID}...")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
 model.eval()
 
 print("✅ Модель загружена\n")
@@ -156,7 +154,7 @@ ax3 = fig.add_subplot(gs[1, :])
 ax3.set_xlim(0, 10)
 ax3.set_ylim(0, 8)
 ax3.axis('off')
-ax3.set_title('Архитектурная схема FinBERT', fontsize=14, fontweight='bold', pad=20)
+ax3.set_title('Архитектурная схема FinBERT-Tone', fontsize=14, fontweight='bold', pad=20)
 
 # Определяем основные компоненты
 components = [
